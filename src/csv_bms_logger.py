@@ -4,20 +4,19 @@ from serial_communication import SerialCommunication
 import csv
 import time
 import bms_params
-from bms_params import BmsParameterId
 import logging
 from datetime import datetime
 
 
 running_params_scalar = [
-    BmsParameterId.RtcTime,
-    BmsParameterId.BatteryVoltage,
-    BmsParameterId.BatteryCurrent,
-    BmsParameterId.BatteryPercent,
-    BmsParameterId.BatteryHealth,
-    BmsParameterId.RemainingCapacity,
-    BmsParameterId.TotalCapacity,
-    BmsParameterId.ChargeCycles,
+    bms_params.RtcTime,
+    bms_params.BatteryVoltage,
+    bms_params.BatteryCurrent,
+    bms_params.BatteryPercent,
+    bms_params.BatteryHealth,
+    bms_params.RemainingCapacity,
+    bms_params.TotalCapacity,
+    bms_params.ChargeCycles,
 ]
 
 
@@ -52,7 +51,7 @@ def main():
             else:
                 data_line.append(param_value)
 
-        temperatures = bms_comm.read_parameter(BmsParameterId.Temperatures)
+        temperatures = bms_comm.read_parameter(bms_params.Temperatures)
         for temp in temperatures["cell_temperatures"]:
             data_line.append(temp)
 
@@ -60,11 +59,11 @@ def main():
         data_line.append(temperatures["charge_fet"])
         data_line.append(temperatures["soft_start_circuit"])
 
-        statistics = bms_comm.read_parameter(BmsParameterId.Statistics)
+        statistics = bms_comm.read_parameter(bms_params.Statistics)
         data_line.append(statistics["lifetime_charged"])
         data_line.append(statistics["current_cycle"])
 
-        data_line += bms_comm.read_parameter(BmsParameterId.CellVoltages1)
+        data_line += bms_comm.read_parameter(bms_params.CellVoltages1)
 
         writer.writerow(data_line)
         csv_file.flush()

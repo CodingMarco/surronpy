@@ -1,10 +1,13 @@
 from serial_communication import SerialCommunication
-from surron_cmd import SurronCmd
-from surron_data_packet import SurronDataPacket
-from typing import Optional, Tuple
-from surron_read_result import SurronReadResult
-import logging
+from surron_data_packet import SurronDataPacket, SurronCmd
 import time
+import logging
+
+
+class SurronReadResult:
+    Success = 1
+    Timeout = 2
+    InvalidData = 3
 
 
 class SurronCommunication:
@@ -13,7 +16,7 @@ class SurronCommunication:
 
     def read_register(
         self, address: int, parameter: int, parameter_length: int
-    ) -> Optional[bytes]:
+    ) -> bytes | None:
         send_packet = SurronDataPacket.create(
             SurronCmd.ReadRequest, address, parameter, parameter_length, None
         )
@@ -49,7 +52,9 @@ class SurronCommunication:
 
         return None
 
-    def receive_packet(self, timeout: float) -> Tuple[str, Optional[SurronDataPacket]]:
+    def receive_packet(
+        self, timeout: float
+    ) -> tuple[SurronReadResult, SurronDataPacket | None]:
         buffer = bytearray(512)
         buffer_pos = 0
         header_length = SurronDataPacket.HEADER_LENGTH

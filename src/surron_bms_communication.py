@@ -1,6 +1,5 @@
-from typing import Optional
-from bms_params import BmsParameterId
 import bms_params
+from bms_params import BmsParameterId
 from surron_communication import SurronCommunication
 
 
@@ -8,7 +7,7 @@ class SurronBmsCommunication:
     def __init__(self, comm: SurronCommunication):
         self.comm = comm
 
-    def read_raw_parameter_data(self, parameter: BmsParameterId) -> Optional[bytes]:
+    def read_raw_parameter_data(self, parameter: BmsParameterId) -> bytes | None:
         return self.comm.read_register(
             bms_params.BMS_ADDRESS,
             parameter.value,

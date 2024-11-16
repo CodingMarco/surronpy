@@ -1,15 +1,20 @@
-from dataclasses import dataclass
-from surron_cmd import SurronCmd
 from struct import pack, unpack
-from typing import Optional
 
 
-@dataclass
+class SurronCmd:
+    ReadRequest = 0x46
+    ReadResponse = 0x47
+    Status = 0x57
+
+
 class SurronHeader:
-    command: SurronCmd
-    address: int
-    parameter: int
-    data_length: int
+    def __init__(
+        self, command: SurronCmd, address: int, parameter: int, data_length: int
+    ):
+        self.command = command
+        self.address = address
+        self.parameter = parameter
+        self.data_length = data_length
 
 
 class SurronDataPacket:
@@ -21,7 +26,7 @@ class SurronDataPacket:
         address: int,
         parameter: int,
         data_length: int,
-        command_data: Optional[bytes],
+        command_data: bytes | None,
     ):
         self.command = command
         self.address = address
@@ -35,7 +40,7 @@ class SurronDataPacket:
         address: int,
         parameter: int,
         data_length: int,
-        command_data: Optional[bytes],
+        command_data: bytes | None,
     ):
         if (
             command == SurronCmd.ReadRequest
@@ -53,7 +58,7 @@ class SurronDataPacket:
         return SurronDataPacket(command, address, parameter, data_length, command_data)
 
     @staticmethod
-    def from_bytes(data: bytes) -> Optional["SurronDataPacket"]:
+    def from_bytes(data: bytes) -> "SurronDataPacket" | None:
         if len(data) < 6:
             raise ValueError("Message too short (less than 6 bytes)")
 
@@ -116,7 +121,7 @@ class SurronDataPacket:
         return sum(data) % 256
 
     @staticmethod
-    def read_header(header: bytes) -> Optional[SurronHeader]:
+    def read_header(header: bytes) -> SurronHeader | None:
         if len(header) < SurronDataPacket.HEADER_LENGTH:
             raise ValueError(
                 f"Header must be at least {SurronDataPacket.HEADER_LENGTH} bytes long"
