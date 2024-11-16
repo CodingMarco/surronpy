@@ -8,9 +8,7 @@ class SurronCmd:
 
 
 class SurronHeader:
-    def __init__(
-        self, command: SurronCmd, address: int, parameter: int, data_length: int
-    ):
+    def __init__(self, command: int, address: int, parameter: int, data_length: int):
         self.command = command
         self.address = address
         self.parameter = parameter
@@ -22,7 +20,7 @@ class SurronDataPacket:
 
     def __init__(
         self,
-        command: SurronCmd,
+        command: int,
         address: int,
         parameter: int,
         data_length: int,
@@ -36,7 +34,7 @@ class SurronDataPacket:
 
     @staticmethod
     def create(
-        command: SurronCmd,
+        command: int,
         address: int,
         parameter: int,
         data_length: int,
@@ -58,7 +56,7 @@ class SurronDataPacket:
         return SurronDataPacket(command, address, parameter, data_length, command_data)
 
     @staticmethod
-    def from_bytes(data: bytes) -> "SurronDataPacket" | None:
+    def from_bytes(data: bytes):
         if len(data) < 6:
             raise ValueError("Message too short (less than 6 bytes)")
 
@@ -101,7 +99,7 @@ class SurronDataPacket:
     def to_bytes(self) -> bytes:
         length = SurronDataPacket.get_packet_length(self.command, self.data_length)
         bytes_data = bytearray(length)
-        bytes_data[0] = self.command.value
+        bytes_data[0] = self.command
         bytes_data[1:3] = pack("<H", self.address)
         bytes_data[3] = self.parameter
         bytes_data[4] = (
