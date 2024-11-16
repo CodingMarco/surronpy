@@ -40,47 +40,51 @@ class BmsParameterId(Enum):
     Unknown_120 = 120
     Unknown_160 = 160
 
+    @property
+    def length(self) -> int:
+        return BmsParameterId.get_length(self)
 
-def get_length(parameter_id: BmsParameterId) -> int:
-    lengths = {
-        BmsParameterId.Unknown_0: 4,
-        BmsParameterId.Unknown_7: 1,
-        BmsParameterId.Temperatures: 8,
-        BmsParameterId.BatteryVoltage: 4,
-        BmsParameterId.BatteryCurrent: 4,
-        BmsParameterId.BatteryPercent: 1,
-        BmsParameterId.BatteryHealth: 4,
-        BmsParameterId.RemainingCapacity: 4,
-        BmsParameterId.TotalCapacity: 4,
-        BmsParameterId.Unknown_17: 2,
-        BmsParameterId.Unknown_20: 4,
-        BmsParameterId.Statistics: 12,
-        BmsParameterId.BmsStatus: 10,
-        BmsParameterId.ChargeCycles: 4,
-        BmsParameterId.DesignedCapacity: 4,
-        BmsParameterId.DesignedVoltage: 4,
-        BmsParameterId.Versions: 8,
-        BmsParameterId.ManufacturingDate: 3,
-        BmsParameterId.Unknown_28: 4,
-        BmsParameterId.RtcTime: 6,
-        BmsParameterId.Unknown_30: 6,
-        BmsParameterId.BmsManufacturer: 16,
-        BmsParameterId.BatteryModel: 32,
-        BmsParameterId.CellType: 16,
-        BmsParameterId.SerialNumber: 32,
-        BmsParameterId.CellVoltages1: 32,
-        BmsParameterId.CellVoltages2: 32,
-        BmsParameterId.History: 14,
-        BmsParameterId.Unknown_39: 64,
-        BmsParameterId.Unknown_48: 64,
-        BmsParameterId.Unknown_120: 64,
-        BmsParameterId.Unknown_160: 32,
-    }
+    @staticmethod
+    def get_length(parameter_id: "BmsParameterId") -> int:
+        lengths = {
+            BmsParameterId.Unknown_0: 4,
+            BmsParameterId.Unknown_7: 1,
+            BmsParameterId.Temperatures: 8,
+            BmsParameterId.BatteryVoltage: 4,
+            BmsParameterId.BatteryCurrent: 4,
+            BmsParameterId.BatteryPercent: 1,
+            BmsParameterId.BatteryHealth: 4,
+            BmsParameterId.RemainingCapacity: 4,
+            BmsParameterId.TotalCapacity: 4,
+            BmsParameterId.Unknown_17: 2,
+            BmsParameterId.Unknown_20: 4,
+            BmsParameterId.Statistics: 12,
+            BmsParameterId.BmsStatus: 10,
+            BmsParameterId.ChargeCycles: 4,
+            BmsParameterId.DesignedCapacity: 4,
+            BmsParameterId.DesignedVoltage: 4,
+            BmsParameterId.Versions: 8,
+            BmsParameterId.ManufacturingDate: 3,
+            BmsParameterId.Unknown_28: 4,
+            BmsParameterId.RtcTime: 6,
+            BmsParameterId.Unknown_30: 6,
+            BmsParameterId.BmsManufacturer: 16,
+            BmsParameterId.BatteryModel: 32,
+            BmsParameterId.CellType: 16,
+            BmsParameterId.SerialNumber: 32,
+            BmsParameterId.CellVoltages1: 32,
+            BmsParameterId.CellVoltages2: 32,
+            BmsParameterId.History: 14,
+            BmsParameterId.Unknown_39: 64,
+            BmsParameterId.Unknown_48: 64,
+            BmsParameterId.Unknown_120: 64,
+            BmsParameterId.Unknown_160: 32,
+        }
 
-    if parameter_id in lengths:
-        return lengths[parameter_id]
-    else:
-        raise ValueError(f"Unknown parameter {parameter_id}")
+        if parameter_id in lengths:
+            return lengths[parameter_id]
+        else:
+            raise ValueError(f"Unknown parameter {parameter_id}")
 
 
 def decode_bms_data(
@@ -164,3 +168,23 @@ def decode_bms_data(
         }
     else:
         return data
+
+
+def get_scalar_params() -> list[BmsParameterId]:
+    return [
+        BmsParameterId.BatteryVoltage,
+        BmsParameterId.BatteryCurrent,
+        BmsParameterId.BatteryPercent,
+        BmsParameterId.BatteryHealth,
+        BmsParameterId.RemainingCapacity,
+        BmsParameterId.TotalCapacity,
+        BmsParameterId.ChargeCycles,
+        BmsParameterId.DesignedCapacity,
+        BmsParameterId.DesignedVoltage,
+        BmsParameterId.ManufacturingDate,
+        BmsParameterId.RtcTime,
+        BmsParameterId.BmsManufacturer,
+        BmsParameterId.BatteryModel,
+        BmsParameterId.CellType,
+        BmsParameterId.SerialNumber,
+    ]
