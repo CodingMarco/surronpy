@@ -8,11 +8,11 @@ class SerialCommunication:
         self.port = port
         self.serial = serial.Serial(port, SURRON_BAUDRATE, timeout=1)
 
-    def read(self, length: int, timeout: float) -> bytes:
-        self.serial.timeout = timeout
-        return self.serial.read(length)
+    async def readinto(self, buf: memoryview, length: int, timeout_ms: int):
+        self.serial.timeout = timeout_ms / 1000
+        return self.serial.readinto(buf[:length])
 
-    def write(self, data: bytes):
+    async def write(self, data: bytes):
         self.serial.write(data)
         self.serial.flush()
 

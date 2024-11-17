@@ -1,4 +1,3 @@
-from serial_communication import SerialCommunication
 from surron_data_packet import SurronDataPacket, SurronCmd
 import time
 import logging
@@ -11,10 +10,10 @@ class SurronReadResult:
 
 
 class SurronCommunication:
-    def __init__(self, serial: SerialCommunication):
+    def __init__(self, serial):
         self.serial = serial
 
-    def read_register(
+    async def read_register(
         self, address: int, parameter: int, parameter_length: int
     ) -> bytes | None:
         send_packet = SurronDataPacket.create(
@@ -23,11 +22,11 @@ class SurronCommunication:
 
         for trial in range(3):
             self.serial.reset_input_buffer()
-            self.serial.write(send_packet.to_bytes())
+            await self.serial.write(send_packet.to_bytes())
 
             # 9600 baud 8N1 = ~960 bytes/s, so 200ms are enough for ~192 bytes.
             # also, BMS takes some time to responsd sometimes when it is busy updating the display (>80ms in some cases)
-            result, packet = self.receive_packet(0.2)
+            result, packet = await self.receive_packet(200)
 
             if result == SurronReadResult.Success:
                 if (
@@ -52,18 +51,18 @@ class SurronCommunication:
 
         return None
 
-    def receive_packet(
-        self, timeout: float
+    async def receive_packet(
+        self, timeout_ms: int
     ) -> tuple[SurronReadResult, SurronDataPacket | None]:
         buffer = bytearray(512)
+        buffer_mv = memoryview(buffer)
         buffer_pos = 0
         header_length = SurronDataPacket.HEADER_LENGTH
 
-        header_data = self.serial.read(header_length, timeout)
-        if not header_data:
+        await self.serial.readinto(buffer_mv, header_length, timeout_ms)
+        if not buffer:
             self.serial.reset()
             return SurronReadResult.Timeout, None
-        buffer[0:header_length] = header_data
         buffer_pos += header_length
 
         rest_length = (
@@ -75,12 +74,11 @@ class SurronCommunication:
             self.serial.reset()
             return SurronReadResult.InvalidData, None
 
-        remaining_data = self.serial.read(rest_length, timeout)
-        if len(remaining_data) < rest_length:
+        num_read = self.serial.readinto(buffer_mv[buffer_pos:], rest_length, timeout_ms)
+        if len(num_read) < rest_length:
             self.serial.reset()
             return SurronReadResult.Timeout, None
 
-        buffer[buffer_pos : buffer_pos + rest_length] = remaining_data
         buffer_pos += rest_length
 
         packet = SurronDataPacket.from_bytes(buffer[:buffer_pos])

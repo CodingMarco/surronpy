@@ -5,6 +5,7 @@ import csv
 import time
 import bms_params
 import logging
+import asyncio
 from datetime import datetime
 
 
@@ -20,7 +21,7 @@ running_params_scalar = [
 ]
 
 
-def main():
+async def main():
     comm = SurronCommunication(serial=SerialCommunication("/dev/ttyUSB0"))
     bms_comm = SurronBmsCommunication(comm)
 
@@ -45,13 +46,13 @@ def main():
     while True:
         data_line = []
         for param in running_params_scalar:
-            param_value = bms_comm.read_parameter(param)
+            param_value = await bms_comm.read_parameter(param)
             if type(param_value) is datetime:
                 data_line.append(param_value.isoformat())
             else:
                 data_line.append(param_value)
 
-        temperatures = bms_comm.read_parameter(bms_params.Temperatures)
+        temperatures = await bms_comm.read_parameter(bms_params.Temperatures)
         for temp in temperatures["cell_temperatures"]:
             data_line.append(temp)
 
@@ -59,11 +60,11 @@ def main():
         data_line.append(temperatures["charge_fet"])
         data_line.append(temperatures["soft_start_circuit"])
 
-        statistics = bms_comm.read_parameter(bms_params.Statistics)
+        statistics = await bms_comm.read_parameter(bms_params.Statistics)
         data_line.append(statistics["lifetime_charged"])
         data_line.append(statistics["current_cycle"])
 
-        data_line += bms_comm.read_parameter(bms_params.CellVoltages1)
+        data_line += await bms_comm.read_parameter(bms_params.CellVoltages1)
 
         writer.writerow(data_line)
         csv_file.flush()
@@ -72,4 +73,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
