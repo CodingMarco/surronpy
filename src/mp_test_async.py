@@ -1,28 +1,26 @@
-# Test of uasyncio stream I/O using UART
-# Author: Peter Hinch
-# Copyright Peter Hinch 2017-2022 Released under the MIT license
-# Link X1 and X2 to test.
-
-# We run with no UART timeout: UART read never blocks.
 import asyncio
 from machine import UART
 
-uart = UART(4, 9600, timeout=0)
+uart0 = UART(0, tx=3, rx=4)
+uart1 = UART(1, tx=5, rx=6)
+uart0.init(baudrate=9600, bits=8, parity=None, stop=1)
+uart1.init(baudrate=9600, bits=8, parity=None, stop=1)
 
 
 async def sender():
-    swriter = asyncio.StreamWriter(uart, {})
+    swriter = asyncio.StreamWriter(uart0, {})
     while True:
-        swriter.write("Hello uart\n")
+        swriter.write("    " * 10)
         await swriter.drain()
-        await asyncio.sleep(2)
+        await asyncio.sleep(0.1)
 
 
 async def receiver():
-    sreader = asyncio.StreamReader(uart)
+    swriter = asyncio.StreamWriter(uart1, {})
     while True:
-        res = await sreader.readline()
-        print("Received", res)
+        swriter.write("ZZZZ" * 10)
+        await swriter.drain()
+        await asyncio.sleep(0.1)
 
 
 async def main():

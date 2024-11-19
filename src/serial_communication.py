@@ -10,6 +10,9 @@ class SerialCommunication:
 
     async def readinto(self, buf: memoryview, length: int, timeout_ms: int):
         self.serial.timeout = timeout_ms / 1000
+        # data_read = self.serial.read(length)
+        # buf[: len(data_read)] = data_read
+        # return len(data_read)
         return self.serial.readinto(buf[:length])
 
     async def write(self, data: bytes):

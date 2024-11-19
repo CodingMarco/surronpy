@@ -1,7 +1,7 @@
 from machine import UART
 
-uart0 = UART(0, tx=3, rx=4)
-uart0.init(baudrate=9600, bits=8, parity=None, stop=1, timeout=1000, invert=UART.INV_RX)
+uart0 = UART(0, tx=3, rx=2)
+uart0.init(baudrate=9600, bits=8, parity=None, stop=1, timeout=1000)
 
 
 def test():
@@ -14,4 +14,4 @@ def read_test():
         print(uart0.read())
 
 
-test()
+read_test()

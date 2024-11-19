@@ -125,13 +125,13 @@ class SurronDataPacket:
                 f"Header must be at least {SurronDataPacket.HEADER_LENGTH} bytes long"
             )
 
-        command = SurronCmd(header[0])
+        command = header[0]
         if command not in (
             SurronCmd.Status,
             SurronCmd.ReadResponse,
             SurronCmd.ReadRequest,
         ):
-            SurronDataPacket.handle_data_error(f"Command {command} is not valid.")
+            SurronDataPacket.handle_data_error(f"Command 0x{command:X} is not valid.")
             return None
 
         address = unpack("<H", header[1:3])[0]

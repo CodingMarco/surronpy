@@ -60,7 +60,7 @@ class SurronCommunication:
         header_length = SurronDataPacket.HEADER_LENGTH
 
         await self.serial.readinto(buffer_mv, header_length, timeout_ms)
-        if not buffer:
+        if not buffer[0]:
             self.serial.reset()
             return SurronReadResult.Timeout, None
         buffer_pos += header_length
@@ -74,8 +74,10 @@ class SurronCommunication:
             self.serial.reset()
             return SurronReadResult.InvalidData, None
 
-        num_read = self.serial.readinto(buffer_mv[buffer_pos:], rest_length, timeout_ms)
-        if len(num_read) < rest_length:
+        num_read = await self.serial.readinto(
+            buffer_mv[buffer_pos:], rest_length, timeout_ms
+        )
+        if num_read < rest_length:
             self.serial.reset()
             return SurronReadResult.Timeout, None
 
