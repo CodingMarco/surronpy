@@ -30,7 +30,8 @@ async def main():
     csv_file = open("bms_data.csv", "w")
     writer = csv.writer(csv_file)
 
-    title_line = [param.name for param in running_params_scalar]
+    title_line = ["HostTime"]
+    title_line += [param.name for param in running_params_scalar]
     title_line += [f"CellTemperature{i}" for i in range(1, 4)]
     title_line += [
         "DischargeFetTemperature",
@@ -44,7 +45,7 @@ async def main():
     writer.writerow(title_line)
 
     while True:
-        data_line = []
+        data_line = [datetime.now().isoformat()]
         for param in running_params_scalar:
             param_value = await bms_comm.read_parameter(param)
             if type(param_value) is datetime:
