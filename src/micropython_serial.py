@@ -125,20 +125,26 @@ SURRON_BAUDRATE = 9600
 class MicropythonSerial:
     def __init__(self, tx_pin: int, rx_pin: int, tx_enable_pin: int):
         self.uart = machine.UART(0, tx=tx_pin, rx=rx_pin)
-        self.uart.init(SURRON_BAUDRATE, tx=tx_pin, rx=rx_pin)
+        # We run with no UART timeout: UART read never blocks.
+        self.uart.init(SURRON_BAUDRATE, tx=tx_pin, rx=rx_pin, timeout=0)
         self.tx_enable_pin = tx_enable_pin
         self.tx_enable = machine.Pin(tx_enable_pin, machine.Pin.OUT)
+        self.sreader = StreamReaderTo(self.uart)
+        self.swriter = asyncio.StreamWriter(self.uart, {})
 
     async def readinto(self, buf: memoryview, length: int, timeout_ms: int):
         self.tx_enable.value(0)
-        sreader = StreamReaderTo(self.uart)
-        return await sreader.readintotim(buf[:length], timeout_ms)
+        return await self.sreader.readintotim(buf[:length], timeout_ms)
 
     async def write(self, data: bytes):
         self.tx_enable.value(1)
-        swriter = asyncio.StreamWriter(self.uart, {})
-        swriter.write(data)
-        await swriter.drain()
+        self.swriter.write(data)
+        await self.swriter.drain()
+
+        # drain() doesn't work here so we wait for the UART to finish sending
+        while not self.uart.txdone():
+            await asyncio.sleep_ms(1)
+
         self.tx_enable.value(0)
 
     def reset_input_buffer(self):
