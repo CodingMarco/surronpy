@@ -124,9 +124,9 @@ SURRON_BAUDRATE = 9600
 
 class MicropythonSerial:
     def __init__(self, tx_pin: int, rx_pin: int, tx_enable_pin: int):
-        self.uart = machine.UART(0, tx=tx_pin, rx=rx_pin)
-        # We run with no UART timeout: UART read never blocks.
-        self.uart.init(SURRON_BAUDRATE, tx=tx_pin, rx=rx_pin, timeout=0)
+        self.tx_pin = tx_pin
+        self.rx_pin = rx_pin
+        self._create_and_init_uart()
         self.tx_enable_pin = tx_enable_pin
         self.tx_enable = machine.Pin(tx_enable_pin, machine.Pin.OUT)
         self.sreader = StreamReaderTo(self.uart)
@@ -154,6 +154,11 @@ class MicropythonSerial:
         self.uart.deinit()
 
     def reset(self):
-        self.uart.deinit()
-        self.uart.init(SURRON_BAUDRATE, tx=self.uart.tx, rx=self.uart.rx)
+        self.close()
+        self._create_and_init_uart()
         self.tx_enable.value(0)
+
+    def _create_and_init_uart(self):
+        self.uart = machine.UART(0, tx=self.tx_pin, rx=self.rx_pin)
+        # We run with no UART timeout: UART read never blocks.
+        self.uart.init(SURRON_BAUDRATE, tx=self.tx_pin, rx=self.rx_pin, timeout=0)
