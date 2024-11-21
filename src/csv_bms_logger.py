@@ -4,8 +4,8 @@ from serial_communication import SerialCommunication
 import csv
 import time
 import bms_params
-import logging
 import asyncio
+from transparency import logging
 from datetime import datetime
 
 

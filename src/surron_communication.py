@@ -1,6 +1,6 @@
 from surron_data_packet import SurronDataPacket, SurronCmd
 import time
-import logging
+from transparency import logging
 
 
 class SurronReadResult:
