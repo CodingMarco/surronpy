@@ -17,6 +17,10 @@ class datetime:
     def isoformat(self):
         return f"{self.year}-{self.month}-{self.day}T{self.hour}:{self.minute}:{self.second}"
 
+    @staticmethod
+    def now():
+        return datetime(2021, 1, 1, 0, 0, 0)
+
 
 log_level = "DEBUG"
 
