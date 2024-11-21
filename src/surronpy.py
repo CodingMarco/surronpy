@@ -2,7 +2,7 @@ from surron_communication import SurronCommunication
 from serial_communication import SerialCommunication
 import bms_params
 from bms_params import BmsParameterId
-import logging
+from transparency import logging
 
 
 def main():
