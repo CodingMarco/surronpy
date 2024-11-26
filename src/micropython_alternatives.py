@@ -1,3 +1,8 @@
+import machine
+
+rtc = machine.RTC()
+
+
 class date:
     def __init__(self, year, month, day):
         self.year = year
@@ -19,7 +24,9 @@ class datetime:
 
     @staticmethod
     def now():
-        return datetime(2021, 1, 1, 0, 0, 0)
+        # We don't need weekday and subseconds
+        year, month, day, _, hours, minutes, seconds, _ = rtc.datetime()
+        return datetime(year, month, day, hours, minutes, seconds)
 
 
 log_level = "DEBUG"

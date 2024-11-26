@@ -22,7 +22,7 @@ class SurronCommunication:
 
         for trial in range(3):
             self.serial.reset_input_buffer()
-            await self.serial.write(send_packet.to_bytes())
+            await self.send_packet(send_packet)
 
             # 9600 baud 8N1 = ~960 bytes/s, so 200ms are enough for ~192 bytes.
             # also, BMS takes some time to responsd sometimes when it is busy updating the display (>80ms in some cases)
@@ -50,6 +50,9 @@ class SurronCommunication:
             time.sleep(0.1)
 
         return None
+
+    async def send_packet(self, packet: SurronDataPacket):
+        await self.serial.write(packet.to_bytes())
 
     async def receive_packet(
         self, timeout_ms: int
