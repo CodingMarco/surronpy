@@ -2,6 +2,7 @@ from surron_bms_communication import SurronBmsCommunication
 from surron_communication import SurronCommunication
 from serial_communication import SerialCommunication
 import csv
+import sys
 import time
 import bms_params
 import asyncio
@@ -27,7 +28,7 @@ async def main():
 
     logging.basicConfig(level=logging.DEBUG)
 
-    csv_file = open("bms_data.csv", "w")
+    csv_file = sys.stdout
     writer = csv.writer(csv_file)
 
     title_line = ["HostTime"]

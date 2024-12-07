@@ -1,3 +1,4 @@
+import gc
 import asyncio
 import bms_params
 from micropython_serial import MicropythonSerial
@@ -5,7 +6,7 @@ from surron_bms_communication import SurronBmsCommunication
 from surron_communication import SurronCommunication
 
 
-running_params_scalar = [
+params_scalar = [
     bms_params.RtcTime,
     bms_params.BatteryVoltage,
     bms_params.BatteryCurrent,
@@ -20,14 +21,22 @@ async def main():
     ser = MicropythonSerial(tx_pin=39, rx_pin=35, tx_enable_pin=37)
     comm = SurronCommunication(serial=ser)
     bms_comm = SurronBmsCommunication(comm)
+    # gc.threshold(1000)
 
+    i = 0
     while True:
-        for param in running_params_scalar:
-            param_value = await bms_comm.read_parameter(param)
-            print(param.name, param_value)
+        try:
+            values = [str(gc.mem_free())]
+            for param in params_scalar:
+                param_value = await bms_comm.read_parameter(param)
+                values.append(f"{param.name}: {param_value}")
+            print(", ".join(values))
+            i += 1
+        except Exception as e:
+            print(e)
 
 
-def run_main():
+def run():
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

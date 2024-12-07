@@ -18,7 +18,7 @@ class MicropythonSerial:
         self.tx_enable.value(0)
         future = self.sreader.readinto(buf[:length])
         try:
-            await asyncio.wait_for_ms(future, timeout_ms)
+            return await asyncio.wait_for_ms(future, timeout_ms)
         except asyncio.TimeoutError:
             return 0
 
@@ -47,4 +47,4 @@ class MicropythonSerial:
     def _create_and_init_uart(self):
         self.uart = machine.UART(0, tx=self.tx_pin, rx=self.rx_pin)
         # We run with no UART timeout: UART read never blocks.
-        self.uart.init(SURRON_BAUDRATE, tx=self.tx_pin, rx=self.rx_pin, timeout=0)
+        self.uart.init(SURRON_BAUDRATE, tx=self.tx_pin, rx=self.rx_pin, timeout=100000)

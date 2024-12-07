@@ -9,6 +9,12 @@ class date:
         self.month = month
         self.day = day
 
+    def __str__(self):
+        return f"{self.year}-{self.month}-{self.day}"
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class datetime:
     def __init__(self, year, month, day, hour, minute, second):
@@ -20,13 +26,20 @@ class datetime:
         self.second = second
 
     def isoformat(self):
-        return f"{self.year}-{self.month}-{self.day}T{self.hour}:{self.minute}:{self.second}"
+        # Padded with zeros
+        return f"{self.year}-{self.month:02}-{self.day:02}T{self.hour:02}:{self.minute:02}:{self.second:02}"
 
     @staticmethod
     def now():
         # We don't need weekday and subseconds
         year, month, day, _, hours, minutes, seconds, _ = rtc.datetime()
         return datetime(year, month, day, hours, minutes, seconds)
+
+    def __str__(self):
+        return self.isoformat()
+
+    def __repr__(self):
+        return self.__str__()
 
 
 log_level = "DEBUG"

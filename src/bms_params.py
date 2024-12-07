@@ -10,6 +10,9 @@ class BmsParameterId:
         self.value = value
         self.length = length
 
+    def __str__(self):
+        return self.name
+
 
 Unknown_0 = BmsParameterId("Unknown_0", 0, 4)
 Unknown_7 = BmsParameterId("Unknown_7", 7, 1)
